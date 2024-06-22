@@ -1,0 +1,63 @@
+import threading
+import random
+import time
+
+NUM_SELF_CHECKOUT_LANES = 4
+NUM_CASHIERS = 3
+
+class LaneData:
+    def __init__(self, lane_id, num_customers):
+        self.lane_id = lane_id
+        self.num_customers = num_customers
+
+def self_checkout(lane_data):
+    id = lane_data.lane_id
+    for i in range(lane_data.num_customers):
+        checkout_time = random.randint(1, 5)  # Simulate checkout time between 1 to 5 seconds
+        print(f"Customer {i + 1} at self-checkout lane {id} starts checkout.")
+        time.sleep(checkout_time)
+        print(f"Customer {i + 1} at self-checkout lane {id} completes checkout.")
+
+def cashier_checkout(lane_data):
+    id = lane_data.lane_id
+    for i in range(lane_data.num_customers):
+        checkout_time = random.randint(1, 5)  # Simulate checkout time between 1 to 5 seconds
+        print(f"Customer {i + 1} at cashier lane {id} starts checkout.")
+        time.sleep(checkout_time)
+        print(f"Customer {i + 1} at cashier lane {id} completes checkout.")
+
+def process_self_checkouts(customers_per_lane):
+    threads = []
+    for i in range(NUM_SELF_CHECKOUT_LANES):
+        data = LaneData(i + 1, customers_per_lane[i])
+        thread = threading.Thread(target=self_checkout, args=(data,))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+    print("All self-checkout lanes processed their customers.")
+
+def process_cashiers(customers_per_lane):
+    threads = []
+    for i in range(NUM_CASHIERS):
+        data = LaneData(i + 1, customers_per_lane[i])
+        thread = threading.Thread(target=cashier_checkout, args=(data,))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+    print("All cashier lanes processed their customers.")
+
+if __name__ == "__main__":
+    random.seed()  # Seed the random number generator
+
+    customers_self_checkout = [int(input(f"Self-checkout lane {i + 1}: ")) for i in range(NUM_SELF_CHECKOUT_LANES)]
+    customers_cashiers = [int(input(f"Cashier lane {i + 1}: ")) for i in range(NUM_CASHIERS)]
+
+    print("Processing self-checkout lanes with one cashier...")
+    process_self_checkouts(customers_self_checkout)
+
+    print("Processing cashier lanes...")
+    process_cashiers(customers_cashiers)
